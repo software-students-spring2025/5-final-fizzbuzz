@@ -1,44 +1,36 @@
 from datetime import datetime
-from app import mongo
-from bson.objectid import ObjectId
+from bson import ObjectId
 
 class User:
-    @staticmethod
-    def create(username, email, password_hash, university=None, monthly_income=0):
-        user = {
-            "username": username,
-            "email": email,
-            "password_hash": password_hash,
-            "university": university,
-            "monthly_income": monthly_income,
-            "created_at": datetime.utcnow()
+    def __init__(self, username, email, password_hash, university=None, monthly_income=0):
+        self.username = username
+        self.email = email
+        self.password_hash = password_hash
+        self.university = university
+        self.monthly_income = monthly_income
+        self.created_at = datetime.now()
+
+    def to_dict(self):
+        return {
+            "username": self.username,
+            "email": self.email,
+            "password_hash": self.password_hash,
+            "university": self.university,
+            "monthly_income": self.monthly_income,
+            "created_at": self.created_at
         }
-        result = mongo.db.users.insert_one(user)
-        return str(result.inserted_id)
-    
-    @staticmethod
-    def find_by_username(username):
-        return mongo.db.users.find_one({"username": username})
-    
-    @staticmethod
-    def find_by_id(user_id):
-        return mongo.db.users.find_one({"_id": ObjectId(user_id)})
 
 class Transaction:
-    @staticmethod
-    def create(user_id, amount, type, category_id, description, date=None):
-        transaction = {
-            "user_id": ObjectId(user_id),
-            "amount": amount,
-            "type": type,  # "expense" or "income"
-            "category_id": ObjectId(category_id) if category_id else None,
-            "description": description,
-            "date": date or datetime.utcnow()
+    def __init__(self, amount, category, description, date=None):
+        self.amount = amount
+        self.category = category
+        self.description = description
+        self.date = date or datetime.now()
+
+    def to_dict(self):
+        return {
+            "amount": self.amount,
+            "category": self.category,
+            "description": self.description,
+            "date": self.date
         }
-        result = mongo.db.transactions.insert_one(transaction)
-        return str(result.inserted_id)
-    
-    @staticmethod
-    def get_by_user(user_id, limit=50):
-        cursor = mongo.db.transactions.find({"user_id": ObjectId(user_id)}).sort("date", -1).limit(limit)
-        return list(cursor)
