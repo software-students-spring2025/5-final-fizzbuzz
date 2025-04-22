@@ -1,6 +1,7 @@
 from datetime import datetime
 from app import mongo
 from bson.objectid import ObjectId
+import json
 
 class User:
     @staticmethod
@@ -10,7 +11,7 @@ class User:
             "email": email,
             "password_hash": password_hash,
             "university": university,
-            "monthly_income": monthly_income,
+            "monthly_income": float(monthly_income) if monthly_income else 0,
             "created_at": datetime.utcnow()
         }
         result = mongo.db.users.insert_one(user)
@@ -29,7 +30,7 @@ class Transaction:
     def create(user_id, amount, type, category_id, description, date=None):
         transaction = {
             "user_id": ObjectId(user_id),
-            "amount": amount,
+            "amount": float(amount),
             "type": type,  # "expense" or "income"
             "category_id": ObjectId(category_id) if category_id else None,
             "description": description,
@@ -41,4 +42,15 @@ class Transaction:
     @staticmethod
     def get_by_user(user_id, limit=50):
         cursor = mongo.db.transactions.find({"user_id": ObjectId(user_id)}).sort("date", -1).limit(limit)
-        return list(cursor)
+        transactions = list(cursor)
+        
+        # Convert ObjectId to string for JSON serialization
+        for transaction in transactions:
+            transaction['_id'] = str(transaction['_id'])
+            transaction['user_id'] = str(transaction['user_id'])
+            if transaction.get('category_id'):
+                transaction['category_id'] = str(transaction['category_id'])
+            if isinstance(transaction.get('date'), datetime):
+                transaction['date'] = transaction['date'].isoformat()
+                
+        return transactions
