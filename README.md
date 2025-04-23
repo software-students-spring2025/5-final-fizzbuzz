@@ -1,8 +1,8 @@
 # Final Project
 
-![Frontend CI/CD](https://github.com/software-students-spring2025/5-final-fizzbuzz/actions/workflows/frontend-ci.yml/badge.svg)
-![Backend CI/CD](https://github.com/software-students-spring2025/5-final-fizzbuzz/actions/workflows/backend-ci.yml/badge.svg)
-![Auto Deploy to DO](https://github.com/software-students-spring2025/5-final-fizzbuzz/actions/workflows/deploy.yml/badge.svg)
+![App CI/CD](https://github.com/software-students-spring2025/5-final-fizzbuzz/actions/workflows/frontend-ci.yml/badge.svg)
+![Database CI/CD](https://github.com/software-students-spring2025/5-final-fizzbuzz/actions/workflows/backend-ci.yml/badge.svg)
+![Deploy Status](https://github.com/software-students-spring2025/5-final-fizzbuzz/actions/workflows/deploy.yml/badge.svg)
 
 An exercise to put to practice software development teamwork, subsystem communication, containers, deployment, and CI/CD pipelines. See [instructions](./instructions.md) for details.
 
