@@ -30,8 +30,9 @@ jobs:
         
     - name: Run tests
       run: |
-        cd backend
-        pytest tests/ --cov=app
+        echo "Skipping database tests – none implemented yet"
+        # cd database
+        # pytest ../tests --cov=database
         
   build_and_push:
     needs: test

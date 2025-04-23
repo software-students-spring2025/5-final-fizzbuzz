@@ -26,7 +26,7 @@ jobs:
       - name: Run tests
         run: |
           cd app
-          pytest tests/ --cov=.
+          pytest ../tests --cov=app
 
   build_and_push:
     needs: test
