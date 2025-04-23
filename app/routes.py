@@ -1,60 +1,158 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app, render_template, send_from_directory
 from app.models import User, Transaction
+from app import mongo
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+from bson import ObjectId
+import logging
+
+logger = logging.getLogger(__name__)
 
 main_bp = Blueprint('main', __name__)
 
+@main_bp.route('/')
+def index():
+    try:
+        return render_template('index.html')
+    except Exception as e:
+        logger.error(f"Error rendering template: {str(e)}")
+        return str(e), 500
+
+@main_bp.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('static', filename)
+
 @main_bp.route('/api/health', methods=['GET'])
 def health_check():
-    return jsonify({"status": "healthy"})
+    try:
+        mongo.db.command('ping')
+        return jsonify({
+            "status": "healthy",
+            "database": "connected"
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "healthy",
+            "database": "disconnected",
+            "message": str(e)
+        })
 
 @main_bp.route('/api/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    
-    # Check if user already exists
-    if User.find_by_username(data.get('username')):
-        return jsonify({"error": "Username already exists"}), 400
-    
-    # Create password hash
-    password_hash = generate_password_hash(data.get('password'))
-    
-    # Create new user
-    user_id = User.create(
-        username=data.get('username'),
-        email=data.get('email'),
-        password_hash=password_hash,
-        university=data.get('university'),
-        monthly_income=data.get('monthly_income', 0)
-    )
-    
-    return jsonify({"message": "User created successfully", "user_id": user_id}), 201
+    try:
+        data = request.get_json()
+        
+        # Check if user already exists
+        if mongo.db.users.find_one({"username": data.get('username')}):
+            return jsonify({"error": "Username already exists"}), 400
+        
+        # Create new user
+        user = User(
+            username=data.get('username'),
+            email=data.get('email'),
+            password_hash=generate_password_hash(data.get('password')),
+            university=data.get('university'),
+            monthly_income=data.get('monthly_income', 0)
+        )
+        
+        result = mongo.db.users.insert_one(user.to_dict())
+        return jsonify({"message": "User created successfully", "user_id": str(result.inserted_id)}), 201
+    except Exception as e:
+        logger.error(f"Error registering user: {str(e)}")
+        return jsonify({
+            "error": "Database error",
+            "message": str(e)
+        }), 503
 
 @main_bp.route('/api/transactions', methods=['GET'])
 def get_transactions():
-    user_id = request.args.get('user_id')
-    if not user_id:
-        return jsonify({"error": "User ID is required"}), 400
-    
-    transactions = Transaction.get_by_user(user_id)
-    return jsonify({"transactions": transactions})
+    try:
+        transactions = list(mongo.db.transactions.find())
+        for transaction in transactions:
+            transaction['_id'] = str(transaction['_id'])
+        return jsonify(transactions)
+    except Exception as e:
+        logger.error(f"Error fetching transactions: {str(e)}")
+        return jsonify({
+            "error": "Database error",
+            "message": str(e)
+        }), 503
 
 @main_bp.route('/api/transactions', methods=['POST'])
-def create_transaction():
-    data = request.get_json()
-    
-    required_fields = ['user_id', 'amount', 'type', 'category_id', 'description']
-    for field in required_fields:
-        if field not in data:
-            return jsonify({"error": f"Missing required field: {field}"}), 400
-    
-    transaction_id = Transaction.create(
-        user_id=data.get('user_id'),
-        amount=data.get('amount'),
-        type=data.get('type'),
-        category_id=data.get('category_id'),
-        description=data.get('description'),
-        date=data.get('date')
-    )
-    
-    return jsonify({"message": "Transaction created", "transaction_id": transaction_id}), 201
+def add_transaction():
+    try:
+        data = request.json
+        transaction = Transaction(
+            amount=data.get('amount'),
+            category=data.get('category'),
+            description=data.get('description')
+        )
+        result = mongo.db.transactions.insert_one(transaction.to_dict())
+        return jsonify({'id': str(result.inserted_id)}), 201
+    except Exception as e:
+        logger.error(f"Error adding transaction: {str(e)}")
+        return jsonify({
+            "error": "Database error",
+            "message": str(e)
+        }), 503
+
+@main_bp.route('/api/transactions/<id>', methods=['DELETE'])
+def delete_transaction(id):
+    try:
+        result = mongo.db.transactions.delete_one({'_id': ObjectId(id)})
+        if result.deleted_count:
+            return '', 204
+        return jsonify({"error": "Transaction not found"}), 404
+    except Exception as e:
+        logger.error(f"Error deleting transaction: {str(e)}")
+        return jsonify({
+            "error": "Database error",
+            "message": str(e)
+        }), 503
+
+@main_bp.route('/api/analytics/monthly', methods=['GET'])
+def get_monthly_analytics():
+    try:
+        pipeline = [
+            {
+                '$group': {
+                    '_id': {
+                        'year': {'$year': '$date'},
+                        'month': {'$month': '$date'}
+                    },
+                    'total': {'$sum': '$amount'},
+                    'count': {'$sum': 1}
+                }
+            },
+            {'$sort': {'_id.year': -1, '_id.month': -1}}
+        ]
+        analytics = list(mongo.db.transactions.aggregate(pipeline))
+        return jsonify(analytics)
+    except Exception as e:
+        logger.error(f"Error fetching monthly analytics: {str(e)}")
+        return jsonify({
+            "error": "Database error",
+            "message": str(e)
+        }), 503
+
+@main_bp.route('/api/analytics/categories', methods=['GET'])
+def get_category_analytics():
+    try:
+        pipeline = [
+            {
+                '$group': {
+                    '_id': '$category',
+                    'total': {'$sum': '$amount'},
+                    'count': {'$sum': 1}
+                }
+            },
+            {'$sort': {'total': -1}}
+        ]
+        analytics = list(mongo.db.transactions.aggregate(pipeline))
+        return jsonify(analytics)
+    except Exception as e:
+        logger.error(f"Error fetching category analytics: {str(e)}")
+        return jsonify({
+            "error": "Database error",
+            "message": str(e)
+        }), 503
