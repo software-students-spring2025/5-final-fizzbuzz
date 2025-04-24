@@ -1,0 +1,21 @@
+services:
+  web_app:
+    build:
+      context: ./app
+    container_name: finance-tracker-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      - MONGODB_URI
+  init_db:
+    build:
+      context: ./database
+    container_name: finance-tracker-init-db
+    entrypoint: ["python", "init_db.py"]
+    env_file:
+      - .env
+    depends_on:
+      - web_app
+    restart: "no"

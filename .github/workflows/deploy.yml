@@ -1,0 +1,27 @@
+name: deploy to digital ocean droplet
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "database/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH into Droplet and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DIGITALOCEAN_IP }}
+          username: ${{ secrets.DIGITALOCEAN_USER }}
+          key: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
+          script: |
+            cd /root/5-final-fizzbuzz
+            git pull
+            docker pull cl3880/finance-tracker-backend:latest
+            docker pull cl3880/finance-tracker-frontend:latest
+            
+            docker-compose down
+            docker-compose up -d

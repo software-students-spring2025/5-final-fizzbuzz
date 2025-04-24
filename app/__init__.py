@@ -26,7 +26,7 @@ def create_app():
     CORS(app)
     
     # MongoDB Configuration
-    mongodb_uri = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017/fizzbuzz')
+    mongodb_uri = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/fizzbuzz')
     app.config['MONGO_URI'] = mongodb_uri
     
     try:
