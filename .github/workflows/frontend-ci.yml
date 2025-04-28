@@ -1,12 +1,10 @@
 name: Frontend CI/CD
 on:
+  workflow_dispatch:
+
   push:
-    paths:
-      - "app/**"
     branches: [main]
   pull_request:
-    paths:
-      - "app/**"
     branches: [main]
 
 jobs:
@@ -29,7 +27,6 @@ jobs:
   build_and_push:
     needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
       - name: Login to DockerHub

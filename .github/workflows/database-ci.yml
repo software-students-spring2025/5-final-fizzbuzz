@@ -1,13 +1,11 @@
 name: Database CI/CD
 
 on:
+  workflow_dispatch:
+
   push:
-    paths:
-      - 'database/**'
     branches: [ main ]
   pull_request:
-    paths:
-      - 'database/**'
     branches: [ main ]
 
 jobs:
@@ -33,9 +31,7 @@ jobs:
         
   build_and_push:
     needs: test
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+    runs-on: ubuntu-latest    
     steps:
     - uses: actions/checkout@v3
     
