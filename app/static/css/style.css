@@ -1,25 +1,47 @@
+/* General Styles */
 body {
     background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+.container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Navigation */
 .navbar {
-    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.navbar-brand {
+    font-weight: bold;
+    color: #4a90e2 !important;
+}
+
+/* Cards */
 .card {
     border: none;
-    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
-    margin-bottom: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
 }
 
-.card-title {
-    color: #2c3e50;
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     font-weight: 600;
+}
+
+/* Forms */
+.form-control {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
 }
 
 .form-control:focus {
     border-color: #4a90e2;
-    box-shadow: 0 0 0 0.2rem rgba(74,144,226,.25);
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
 }
 
 .btn-primary {
@@ -32,32 +54,144 @@ body {
     border-color: #357abd;
 }
 
+/* Transaction Table */
+.table {
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
 .table th {
     border-top: none;
-    color: #6c757d;
+    background-color: #f8f9fa;
     font-weight: 600;
 }
 
-.table td {
+.table td, .table th {
+    padding: 1rem;
     vertical-align: middle;
 }
 
-canvas {
-    max-height: 300px;
+/* Charts */
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin-bottom: 1.5rem;
 }
 
+/* Alerts */
 .alert {
-    margin-top: 1rem;
+    border-radius: 5px;
     margin-bottom: 1rem;
 }
 
-/* Responsive adjustments */
+/* Transaction Type Indicators */
+.text-expense {
+    color: #dc3545;
+}
+
+.text-income {
+    color: #28a745;
+}
+
+/* Responsive Adjustments */
 @media (max-width: 768px) {
-    .container {
-        padding: 0 15px;
-    }
-    
     .card {
         margin-bottom: 1rem;
     }
+    
+    .table-responsive {
+        border-radius: 10px;
+    }
+    
+    .chart-container {
+        height: 250px;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Form Elements */
+select.form-control {
+    cursor: pointer;
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+/* Button Styles */
+.btn {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+/* Loading State */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+/* Chart Legend */
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin: 0 1rem;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
 } 
