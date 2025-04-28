@@ -1,21 +1,39 @@
+version: '3.8'
+
 services:
-  web_app:
-    build:
-      context: ./app
-    container_name: finance-tracker-backend
+  web:
+    build: .
     ports:
-      - "5000:5000"
-    env_file:
-      - .env
+      - "8000:5000"
+    volumes:
+      - .:/app
     environment:
-      - MONGODB_URI
-  init_db:
-    build:
-      context: ./database
-    container_name: finance-tracker-init-db
-    entrypoint: ["python", "init_db.py"]
-    env_file:
-      - .env
+      - FLASK_APP=app
+      - FLASK_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017/finance_tracker
     depends_on:
-      - web_app
-    restart: "no"
+      - mongodb
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:latest
+    container_name: finance-tracker-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
