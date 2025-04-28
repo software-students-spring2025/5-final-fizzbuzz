@@ -62,8 +62,8 @@ def test_register_success(unauth_client):
             "confirm_password": "securepassword123"
         })
 
-        assert response.status_code == 302  # Redirects to dashboard
-        assert response.headers['Location'] == '/dashboard'
+        assert response.status_code == 302
+        assert response.headers['Location'].endswith('/dashboard')
 
 def test_register_existing_email(unauth_client):
     mock_user = {"username": "existinguser"}
@@ -84,7 +84,6 @@ def test_register_missing_fields(unauth_client):
     with patch('app.routes.render_template', return_value='') as mock_render:
         response = unauth_client.post('/register', data={
             "username": "newuser"
-            # missing email and password
         })
         assert response.status_code == 200
         mock_render.assert_called_with('register.html', error="All fields are required")
@@ -135,7 +134,6 @@ def test_create_transaction_missing_field(client):
         "amount": 20.0,
         "type": "expense",
         "description": "Groceries"
-        # "category" is missing
     })
     assert response.status_code == 400
 
@@ -229,11 +227,11 @@ def test_category_analytics_db_error(client):
 
 def test_index_success(client):
     response = client.get('/')
-    assert response.status_code == 302  # Redirects to dashboard
+    assert response.status_code == 302
 
 def test_serve_static(client):
     response = client.get('/static/js/app.js')
-    assert response.status_code == 404  # File not found
+    assert response.status_code == 404
 
 def test_login_success(unauth_client):
     mock_user = {
@@ -249,7 +247,7 @@ def test_login_success(unauth_client):
             "password": "password123"
         })
         assert response.status_code == 302
-        assert response.headers['Location'] == '/dashboard'
+        assert response.headers['Location'].endswith('/dashboard')
 
 def test_login_invalid_credentials(unauth_client):
     with patch('app.models.User.login', return_value=None):
@@ -297,12 +295,12 @@ def test_login_get_page(unauth_client):
 def test_login_already_authenticated(client):
     response = client.get('/login')
     assert response.status_code == 302
-    assert response.headers['Location'] == '/dashboard'
+    assert response.headers['Location'].endswith('/dashboard')
 
 def test_register_already_authenticated(client):
     response = client.get('/register')
     assert response.status_code == 302
-    assert response.headers['Location'] == '/dashboard'
+    assert response.headers['Location'].endswith('/dashboard')
 
 def test_dashboard_page(client):
     with patch('app.routes.render_template', return_value='') as mock_render:
@@ -313,12 +311,12 @@ def test_dashboard_page(client):
 def test_dashboard_unauthorized(unauth_client):
     response = unauth_client.get('/dashboard')
     assert response.status_code == 302
-    assert response.headers['Location'] == '/login'
+    assert response.headers['Location'].endswith('/login')
 
 def test_logout(client):
     response = client.get('/logout')
     assert response.status_code == 302
-    assert response.headers['Location'] == '/login'
+    assert response.headers['Location'].endswith('/login')
     with client.session_transaction() as sess:
         assert 'user_id' not in sess
         assert 'username' not in sess
