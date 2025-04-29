@@ -29,6 +29,12 @@ Our containerized applications are available on Docker Hub:
 - Frontend Application: [finance-tracker-frontend](https://hub.docker.com/repository/docker/cl3880/finance-tracker-frontend/general)
 - Backend Database: [finance-tracker-backend](https://hub.docker.com/repository/docker/cl3880/finance-tracker-backend/general)
 
+## Deployed Application
+The Student Finance Tracker is deployed and accessible at:
+- [http://165.227.75.187:8000/login](http://165.227.75.187:8000/login)
+
+You can access the application directly through this URL to manage your finances without setting up a local environment.
+
 ## Setup Instructions
 Follow these steps to get your development environment up and running:
 
