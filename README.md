@@ -24,6 +24,11 @@ The system consists of three main components:
 2. **MongoDB Database**: Stores user accounts, transactions, categories, and budgets.
 3. **DockerHub and Docker Compose Setup**: Uses Docker Compose to run everything, and DockerHub to store data for the app and database, keeping deployment much faster. 
 
+## Docker Images
+Our containerized applications are available on Docker Hub:
+- Frontend Application: [finance-tracker-frontend](https://hub.docker.com/repository/docker/cl3880/finance-tracker-frontend/general)
+- Backend Database: [finance-tracker-backend](https://hub.docker.com/repository/docker/cl3880/finance-tracker-backend/general)
+
 ## Setup Instructions
 Follow these steps to get your development environment up and running:
 
@@ -73,6 +78,17 @@ MongoDB is automatically started by Docker Compose. Database details:
 - Database Name: finance_tracker<br>
 - Collection: users, transactions, categories, budgets<br>
 - Port: 27017
+
+### Database Initialization
+The database is automatically initialized with default categories when the application starts. The initialization script (`database/init_db.py`) performs the following tasks:
+- Creates necessary indexes for better query performance
+- Loads default expense/income categories
+
+If you need to manually initialize the database, you can run:
+```bash
+cd database
+python init_db.py
+```
 
 ## Environment Configuration
 Create a '.env' file at the project root as these variables are required for the application to connect to MongoDB and manage session security. 
