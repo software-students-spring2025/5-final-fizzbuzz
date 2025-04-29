@@ -26,8 +26,8 @@ The system consists of three main components:
 
 ## Docker Images
 Our containerized applications are available on Docker Hub:
-- Frontend Application: [finance-tracker-frontend](https://hub.docker.com/r/cl3880/finance-tracker-frontend)
-- Backend Database: [finance-tracker-backend](https://hub.docker.com/r/cl3880/finance-tracker-backend)
+- Frontend Application: [finance-tracker-frontend](https://hub.docker.com/repository/docker/cl3880/finance-tracker-frontend/general)
+- Backend Database: [finance-tracker-backend](https://hub.docker.com/repository/docker/cl3880/finance-tracker-backend/general)
 
 ## Setup Instructions
 Follow these steps to get your development environment up and running:
