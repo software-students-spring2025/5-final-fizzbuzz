@@ -19,8 +19,8 @@ jobs:
           script: |
             cd /root/5-final-fizzbuzz
             git pull
-            docker pull ${{ secrets.DOCKER_USERNAME }}/finance-tracker-backend:latest
-            docker pull ${{ secrets.DOCKER_USERNAME }}/finance-tracker-frontend:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/finance-tracker-backend:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/finance-tracker-frontend:latest
             
             docker-compose down
             docker-compose up -d
